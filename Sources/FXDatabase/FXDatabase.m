@@ -83,7 +83,7 @@
 
 - (NSString *)fx_tableName {
     NSString *tableName = NSStringFromClass(self.tableType);
-    [tableName stringByReplacingOccurrencesOfString:@"." withString:@""];
+    tableName = [tableName stringByReplacingOccurrencesOfString:@"." withString:@""];
     return tableName;
 }
 
