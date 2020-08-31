@@ -150,7 +150,8 @@
     for (int i = 0; i < outCount; i++) {
         Ivar ivar = ivars[i];
         NSString *field = [NSString stringWithUTF8String:ivar_getName(ivar)];
-        [updateStr appendFormat:@"%@ = '%@'", field, [entity.entity valueForKey:field]];
+        id value = [entity.entity valueForKey:field];
+        [updateStr appendFormat:@"%@ = '%@'", field, value == nil ? @"" : value];
         if (i != outCount - 1) {
             [updateStr appendString:@", "];
         }
