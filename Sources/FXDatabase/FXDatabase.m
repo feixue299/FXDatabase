@@ -90,22 +90,18 @@
 - (void)addEntity:(NSObject *)entity {
     if (entity == nil) return;
     unsigned int outCount;
-    Ivar *ivars = class_copyIvarList(entity.class, &outCount);
-    NSMutableString *fieldStr = @"".mutableCopy;
-    NSMutableString *valueStr = @"".mutableCopy;
+    Ivar *ivars = class_copyIvarList(self.tableType, &outCount);
+    NSMutableArray *fieldArr = @[].mutableCopy;
+    NSMutableArray *valueArr = @[].mutableCopy;
     for (int i = 0; i < outCount; i++) {
         Ivar ivar = ivars[i];
         NSString *field = [NSString stringWithUTF8String:ivar_getName(ivar)];
         id value = [entity valueForKey:field];
-        [fieldStr appendString:field];
-        [valueStr appendFormat:@"'%@'", value];
-        if (i != outCount - 1) {
-            [fieldStr appendString:@", "];
-            [valueStr appendString:@", "];
-        }
+        [fieldArr addObject:field];
+        [valueArr addObject:[NSString stringWithFormat:@"'%@'", value == nil ? @"" : value]];
     }
 
-    NSString *sql = [NSString stringWithFormat:@"insert into %@ (%@) values (%@)", self.fx_tableName, fieldStr, valueStr];
+    NSString *sql = [NSString stringWithFormat:@"insert into %@ (%@) values (%@)", self.fx_tableName, [fieldArr componentsJoinedByString:@", "], [valueArr componentsJoinedByString:@", "]];
     [self.database executeUpdate:sql];
 }
 

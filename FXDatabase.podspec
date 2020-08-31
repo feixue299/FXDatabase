@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |spec|
   spec.name         = "FXDatabase"
-  spec.version      = "0.1.2"
+  spec.version      = "0.1.3"
   spec.summary      = "对FMDB的封装"
   spec.homepage     = "https://github.com/feixue299/FXDatabase"
   spec.license      = { :type => "MIT", :file => "LICENSE" }

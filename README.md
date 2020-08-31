@@ -7,7 +7,7 @@
 For FXListKit, use the following entry in your Podfile:
 
 ```rb
-pod 'FXDatabase', '~> 0.1.2'
+pod 'FXDatabase', '~> 0.1.3'
 ```
 
 Then run `pod install`.
@@ -19,7 +19,7 @@ Create a `Package.swift` file.
 ```swift
 let package = Package(
     dependencies: [
-        .package(url: "https://github.com/feixue299/FXDatabase.git", from: "0.1.2")
+        .package(url: "https://github.com/feixue299/FXDatabase.git", from: "0.1.3")
     ],
     // ...
 )
