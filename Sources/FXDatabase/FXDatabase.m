@@ -25,6 +25,7 @@
 @interface FXDatabase ()
 @property (nonatomic, strong) FMDatabase *database;
 @property (nonatomic, copy) NSString *identifierField;
+@property (readonly) NSString *fx_tableName;
 @end
 
 @implementation FXDatabase
@@ -62,7 +63,6 @@
 
 - (void)setTableType:(Class)tableType {
     _tableType = tableType;
-    NSString *tableName = NSStringFromClass(tableType);
 
     unsigned int outCount;
     Ivar *ivars = class_copyIvarList(tableType, &outCount);
@@ -76,14 +76,19 @@
         }
     }
 
-    NSString *createTableSqlString = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (%@ integer PRIMARY KEY AUTOINCREMENT, %@)", tableName, self.identifierField, fieldStr];
+    NSString *createTableSqlString = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (%@ integer PRIMARY KEY AUTOINCREMENT, %@)", self.fx_tableName, self.identifierField, fieldStr];
 
     [self.database executeUpdate:createTableSqlString];
 }
 
+- (NSString *)fx_tableName {
+    NSString *tableName = NSStringFromClass(self.tableType);
+    [tableName stringByReplacingOccurrencesOfString:@"." withString:@""];
+    return tableName;
+}
+
 - (void)addEntity:(NSObject *)entity {
     if (entity == nil) return;
-    NSString *tableName = NSStringFromClass(entity.class);
     unsigned int outCount;
     Ivar *ivars = class_copyIvarList(entity.class, &outCount);
     NSMutableString *fieldStr = @"".mutableCopy;
@@ -100,13 +105,12 @@
         }
     }
 
-    NSString *sql = [NSString stringWithFormat:@"insert into %@ (%@) values (%@)", tableName, fieldStr, valueStr];
+    NSString *sql = [NSString stringWithFormat:@"insert into %@ (%@) values (%@)", self.fx_tableName, fieldStr, valueStr];
     [self.database executeUpdate:sql];
 }
 
 - (NSArray<FXIdentifierEntity *> *)queryEntitys {
     NSMutableArray *result = @[].mutableCopy;
-    NSString *tableName = NSStringFromClass(self.tableType);
     unsigned int outCount;
     Ivar *ivars = class_copyIvarList(self.tableType, &outCount);
     NSMutableString *fieldStr = @"".mutableCopy;
@@ -118,7 +122,7 @@
             [fieldStr appendString:@", "];
         }
     }
-    NSString *sql = [NSString stringWithFormat:@"select %@, %@ FROM %@", self.identifierField, fieldStr, tableName];
+    NSString *sql = [NSString stringWithFormat:@"select %@, %@ FROM %@", self.identifierField, fieldStr, self.fx_tableName];
     FMResultSet *rs = [self.database executeQuery:sql];
     while ([rs next]) {
         int identifier = [rs intForColumnIndex:0];
@@ -138,14 +142,12 @@
 
 - (void)deleteEntity:(FXIdentifierEntity *)entity {
     if (entity == nil) return;
-    NSString *tableName = NSStringFromClass(self.tableType);
-    NSString *sql = [NSString stringWithFormat:@"delete from %@ where %@ = %ld", tableName, self.identifierField, (long)entity.identifier];
+    NSString *sql = [NSString stringWithFormat:@"delete from %@ where %@ = %ld", self.fx_tableName, self.identifierField, (long)entity.identifier];
     [self.database executeUpdate:sql];
 }
 
 - (void)updateEntity:(FXIdentifierEntity *)entity {
     if (entity == nil) return;
-    NSString *tableName = NSStringFromClass(entity.entity.class);
     NSMutableString *updateStr = @"".mutableCopy;
     unsigned int outCount;
     Ivar *ivars = class_copyIvarList(entity.entity.class, &outCount);
@@ -157,7 +159,7 @@
             [updateStr appendString:@", "];
         }
     }
-    NSString *sql = [NSString stringWithFormat:@"update %@ set %@ where %@ = %ld", tableName, updateStr, self.identifierField, (long)entity.identifier];
+    NSString *sql = [NSString stringWithFormat:@"update %@ set %@ where %@ = %ld", self.fx_tableName, updateStr, self.identifierField, (long)entity.identifier];
     [self.database executeUpdate:sql];
 }
 
