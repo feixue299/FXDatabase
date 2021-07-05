@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <FMDB/FMDB.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -16,8 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface FXDatabase<Entity: NSObject *> : NSObject
-
-@property (nonatomic, copy) NSString *dataBasePath;
+@property (nonatomic, readonly) FMDatabase *database;
+@property (nonatomic, readonly) NSString *dataBasePath;
 @property (nonatomic, copy) Class tableType;
 
 + (instancetype)shareInstance;

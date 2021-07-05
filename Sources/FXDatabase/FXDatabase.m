@@ -24,6 +24,7 @@
 
 @interface FXDatabase ()
 @property (nonatomic, strong) FMDatabase *database;
+@property (nonatomic, copy) NSString *dataBasePath;
 @property (nonatomic, copy) NSString *identifierField;
 @property (readonly) NSString *fx_tableName;
 @end
